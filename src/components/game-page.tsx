@@ -210,9 +210,26 @@ export default function GamePage() {
 
   const handleCopyCode = async () => {
     if (!game) return;
-    await navigator.clipboard.writeText(game.code).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    let success = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      success = await navigator.clipboard.writeText(game.code).then(() => true).catch(() => false);
+    }
+    if (!success) {
+      // Fallback for HTTP / non-secure contexts
+      const el = document.createElement('textarea');
+      el.value = game.code;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      success = document.execCommand('copy');
+      document.body.removeChild(el);
+    }
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   if (!loading && !playerData) {
