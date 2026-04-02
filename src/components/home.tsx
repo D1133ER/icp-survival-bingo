@@ -40,6 +40,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hostName, setHostName] = useState('');
+  const [freeSquare, setFreeSquare] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [gameCode, setGameCode] = useState('');
 
@@ -49,10 +50,10 @@ export default function Home() {
     setLoading(true);
     setError('');
     try {
-      const data = await createGame(hostName.trim());
+      const data = await createGame(hostName.trim(), freeSquare);
       localStorage.setItem(
         `bingo_player_${data.code}`,
-        JSON.stringify({ playerId: data.playerId, isHost: true, card: data.card })
+        JSON.stringify({ playerId: data.playerId, isHost: true, card: data.card, token: data.token })
       );
       navigate(`/game/${data.code}`);
     } catch (err: unknown) {
@@ -72,7 +73,7 @@ export default function Home() {
       const data = await joinGame(code, playerName.trim());
       localStorage.setItem(
         `bingo_player_${code}`,
-        JSON.stringify({ playerId: data.playerId, isHost: false, card: data.card })
+        JSON.stringify({ playerId: data.playerId, isHost: false, card: data.card, token: data.token })
       );
       navigate(`/game/${code}`);
     } catch (err: unknown) {
@@ -190,6 +191,16 @@ export default function Home() {
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-indigo-300 h-11"
                     />
                   </div>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm text-indigo-200">
+                    <input
+                      type="checkbox"
+                      checked={freeSquare}
+                      onChange={e => setFreeSquare(e.target.checked)}
+                      disabled={loading}
+                      className="w-4 h-4 rounded accent-indigo-500"
+                    />
+                    ⭐ Free center square (easier for short sessions)
+                  </label>
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white font-bold shadow-lg h-12 text-base"

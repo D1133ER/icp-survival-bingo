@@ -1,8 +1,14 @@
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { config } from './config';
 
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL ?? 'postgresql://bingo:bingo_password@localhost:5432/bingo',
+  connectionString: config.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
 });
+
+pool.on('error', (err) => {
+  console.error('[db] Unexpected pool error:', err.message);
+});
+

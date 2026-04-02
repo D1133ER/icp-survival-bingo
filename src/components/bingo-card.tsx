@@ -9,8 +9,10 @@ interface BingoCardProps {
   newlyCalledNumber?: number | null;
   /** When true the card expands to fill its container height */
   fullSize?: boolean;
-  /** Called when a student clicks any cell */
+  /** Called when a student clicks any non-called cell (for local marking) */
   onCellClick?: (num: number) => void;
+  /** Numbers locally pre-marked by the student (not yet officially called) */
+  manuallyMarked?: Set<number>;
 }
 
 /** Sparkle overlay shown briefly when a cell is newly daubed */
@@ -38,20 +40,24 @@ function DaubSpark() {
 
 function BingoCell({
   num,
-  isMarked,
+  isCalled,
+  isManual,
   isWinCell,
   isNew,
   fullSize,
   onClick,
 }: {
   num: number;
-  isMarked: boolean;
+  isCalled: boolean;
+  isManual: boolean;
   isWinCell: boolean;
   isNew: boolean;
   fullSize: boolean;
   onClick?: (num: number) => void;
 }) {
-  const prevMarkedRef = useRef(isMarked);
+  const isMarked = isCalled || isManual;
+  const isFree = num === 0;
+  const prevMarkedRef = useRef(isMarked || isFree);
   const justDaubedRef = useRef(false);
 
   // Detect transition from unmarked → marked
@@ -69,30 +75,32 @@ function BingoCell({
   return (
     <div
       key={`${num}-${daubKey.current}`}
-      onClick={!isMarked && onClick ? () => onClick(num) : undefined}
+      onClick={!isCalled && !isFree && onClick ? () => onClick(num) : undefined}
       className={cn(
         'relative flex flex-col items-center justify-center rounded-xl border-2 overflow-hidden',
         'transition-colors duration-200 select-none',
-        !isMarked && onClick && 'cursor-pointer active:scale-95',
-        !isMarked && [
+        isFree && 'bg-gradient-to-br from-amber-400 to-yellow-500 border-amber-300 text-white shadow-inner',
+        !isFree && !isMarked && onClick && 'cursor-pointer active:scale-95',
+        !isFree && !isMarked && [
           'bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600 text-slate-200',
-          'hover:border-indigo-400 hover:from-slate-700 hover:to-slate-600 cursor-default',
+          'hover:border-indigo-400 hover:from-slate-700 hover:to-slate-600',
         ],
-        isMarked && !isWinCell && 'bg-gradient-to-br from-violet-600 to-indigo-600 border-violet-400 text-white shadow-inner',
+        !isFree && isManual && !isCalled && !isWinCell && 'bg-gradient-to-br from-amber-600 to-orange-600 border-amber-400 text-white shadow-inner cursor-pointer active:scale-95',
+        !isFree && isCalled && !isWinCell && 'bg-gradient-to-br from-violet-600 to-indigo-600 border-violet-400 text-white shadow-inner',
         isWinCell && 'bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 border-emerald-300 text-white animate-win-pulse',
         isNew && 'ring-2 ring-yellow-400 ring-offset-1 animate-daub',
-        isMarked && !isNew && daubKey.current > 0 && 'animate-daub',
+        !isFree && isMarked && !isNew && daubKey.current > 0 && 'animate-daub',
       )}
     >
       {/* Daubed overlay */}
-      {isMarked && (
+      {(isMarked || isFree) && (
         <div className={cn(
           'absolute inset-0 flex items-center justify-center pointer-events-none',
           isWinCell ? 'opacity-30' : 'opacity-20',
         )}>
           <div className={cn(
             'w-4/5 h-4/5 rounded-full border-4',
-            isWinCell ? 'border-white' : 'border-violet-300',
+            isWinCell ? 'border-white' : isFree ? 'border-amber-200' : isCalled ? 'border-violet-300' : 'border-amber-300',
           )} />
         </div>
       )}
@@ -100,17 +108,17 @@ function BingoCell({
       {isNew && <DaubSpark />}
 
       {/* Emoji */}
-      <span className={cn('leading-none mb-0.5', fullSize ? 'text-lg' : 'text-base', !isMarked && 'opacity-75')}>
-        {getBingoEmoji(num)}
+      <span className={cn('leading-none mb-0.5', fullSize ? 'text-lg' : 'text-base', !isMarked && !isFree && 'opacity-75')}>
+        {isFree ? '⭐' : getBingoEmoji(num)}
       </span>
 
       {/* Label */}
       <span className={cn(
         'leading-tight text-center break-words w-full px-0.5 block font-semibold',
         fullSize ? 'text-[11px]' : 'text-[9px]',
-        !isMarked && 'opacity-90 text-slate-100',
+        !isMarked && !isFree && 'opacity-90 text-slate-100',
       )}>
-        {getBingoItemText(num)}
+        {isFree ? 'FREE' : getBingoItemText(num)}
       </span>
 
       {/* Win star */}
@@ -128,6 +136,7 @@ export function BingoCard({
   newlyCalledNumber = null,
   fullSize = false,
   onCellClick,
+  manuallyMarked,
 }: BingoCardProps) {
   const calledSet = new Set(calledNumbers);
   const winningCells = getWinningCells(card, calledNumbers);
@@ -163,14 +172,16 @@ export function BingoCard({
       )}>
         {card.map((row, rowIdx) =>
           row.map((num, colIdx) => {
-            const isMarked = calledSet.has(num);
+            const isCalled = calledSet.has(num);
+            const isManual = !!manuallyMarked?.has(num);
             const isWinCell = winningCells.has(`${rowIdx}-${colIdx}`);
             const isNew = num === newlyCalledNumber;
             return (
               <BingoCell
                 key={`${rowIdx}-${colIdx}`}
                 num={num}
-                isMarked={isMarked}
+                isCalled={isCalled}
+                isManual={isManual}
                 isWinCell={isWinCell}
                 isNew={isNew}
                 fullSize={fullSize}

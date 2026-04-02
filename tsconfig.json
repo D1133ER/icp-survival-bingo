@@ -14,12 +14,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    "strict": false,
+    "strict": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shared/*": ["./shared/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "shared"],
   "exclude": [],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

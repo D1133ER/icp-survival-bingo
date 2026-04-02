@@ -1,0 +1,73 @@
+/**
+ * Single source of truth for all bingo items and their emojis.
+ * Pool of 50 items – each game randomly selects 25.
+ * Shared by both server and client.
+ */
+
+export const BINGO_ITEMS = [
+  'All-nighter before submission',
+  'Debugged code for 2+ hours',
+  'Used ChatGPT for assignment',
+  '"I\'ll start early next time"',
+  'Python vs Java confusion',
+  'Attended class for attendance',
+  'Googled error & copied fix',
+  'Did all the group work 💀',
+  'Forgot deadline, panicked',
+  'Learned from YouTube not class',
+  'AI tools saved the day 🤖',
+  'Code finally ran! 🎉',
+  'Survived a surprise quiz',
+  'WiFi issues on submission day',
+  'Thought of a startup idea 💡',
+  'Skipped breakfast for class ☕',
+  'Submitted 1 min before deadline',
+  'Copy-pasted code from GitHub',
+  "Teacher said 'revise basics'",
+  'Presentation stage fright 😨',
+  'Begged for deadline extension',
+  'Zoom / online class glitch 💻',
+  'Stack Overflow to the rescue 📚',
+  'Pulled exam-night all-nighter',
+  'Celebrated when code compiled',
+  // --- Extended pool ---
+  'Fell asleep in morning lecture',
+  'Accidentally pushed to main 🫠',
+  'Forgot to save before crash',
+  'Ate instant noodles for dinner',
+  "Prof's slides were unreadable",
+  'Missed class for "mental health"',
+  'Submitted wrong file 😭',
+  'Laptop died during exam',
+  'Group member ghosted',
+  'Pretended to understand recursion',
+  'Downloaded wrong IDE version',
+  'Lost USB with final project',
+  'Said "it works on my machine"',
+  'Wrote code in Notepad',
+  'Accidentally deleted database',
+  'Spent 3 hours on a semicolon',
+  'Asked ChatGPT to explain the code you just wrote',
+  'Forgot password on exam day',
+  'Prof called on you & you zoned out',
+  'Printed 50 pages single-sided',
+  'Showed up to wrong classroom',
+  'Crammed entire semester in 1 night',
+  'Wore pajamas to campus',
+  'Code compiled first try (impossible)',
+  'Blamed the compiler for your bug',
+] as const;
+
+export const BINGO_EMOJIS: Record<number, string> = {
+  1: '😴', 2: '🐛', 3: '🤖', 4: '😅', 5: '🐍',
+  6: '💺', 7: '🔍', 8: '💪', 9: '😱', 10: '📺',
+  11: '🛠️', 12: '🎉', 13: '😬', 14: '📶', 15: '💡',
+  16: '☕', 17: '⏰', 18: '😅', 19: '👨‍🏫', 20: '😨',
+  21: '🙏', 22: '💻', 23: '📚', 24: '😰', 25: '🎊',
+  // Extended
+  26: '😴', 27: '🫠', 28: '💾', 29: '🍜', 30: '📊',
+  31: '🧘', 32: '😭', 33: '🔋', 34: '👻', 35: '🤔',
+  36: '💿', 37: '🔌', 38: '🖥️', 39: '📝', 40: '💥',
+  41: '🔎', 42: '🤖', 43: '🔑', 44: '😳', 45: '🖨️',
+  46: '🚪', 47: '📖', 48: '👖', 49: '✨', 50: '🪲',
+};
